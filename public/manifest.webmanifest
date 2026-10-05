@@ -1,0 +1,12 @@
+{
+  "name": "N-ATLAS StudyMate",
+  "short_name": "StudyMate",
+  "description": "Voice-first multilingual AI study assistant powered by N-ATLAS.",
+  "start_url": "/study",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#09090b",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
