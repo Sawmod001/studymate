@@ -38,3 +38,9 @@ Check status anytime: `GET /api/health` (config presence only, no secrets).
 - `lib/db/` — `server.ts` (service-role, null when unconfigured), `client.ts` (browser anon)
 - `supabase/migrations/` — run in Supabase SQL editor
 - `docs/` — full NAIC spec set (01–16); `evidence/01–07/` — submission folders
+
+## N-ATLAS paths (hosted vs self-host)
+
+- **Path A (hosted API):** use official NCAIR/NAIC credentials in `.env.local`. Fastest if you get them.
+- **Path B (self-host):** `inference/` runs the official `NCAIR1/N-ATLaS` weights on your own CUDA GPU and speaks the same contract, so the app works unchanged. See `inference/README.md`.
+- Either way, ASR must be the official N-ATLAS ASR service (PS2 key requirement) — the model card ships text weights only.

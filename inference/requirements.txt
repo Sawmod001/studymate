@@ -1,0 +1,7 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+transformers>=4.44
+accelerate>=0.33
+# torch: install the CUDA build separately for your driver, e.g.
+# pip install torch --index-url https://download.pytorch.org/whl/cu121
+torch>=2.4
