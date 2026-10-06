@@ -39,7 +39,7 @@ export default function SubmissionPage() {
   }
 
   const items: Array<{ id: string; title: string; auto: string; autoOk: boolean; hint: string }> = [
-    { id: "artefact", title: "1. Working Artefact", auto: deployed ? "App is deployed (not localhost)" : "Running on localhost — deploy to Vercel", autoOk: deployed, hint: "Deploy via Vercel, paste the URL into the ONDI portal." },
+    { id: "artefact", title: "1. Working Artefact", auto: deployed ? "App is deployed (not localhost)" : "Running on localhost — deploy to Netlify", autoOk: deployed, hint: "Deploy via Netlify, paste the URL into the ONDI portal." },
     { id: "integration", title: "2. N-ATLAS Integration Evidence", auto: counts.natlas ? `Keys configured, ${counts.evidence} successful N-ATLAS calls logged` : "N-ATLAS keys not configured yet", autoOk: counts.natlas && counts.evidence > 0, hint: "See /integration. Screenshot it with secrets absent." },
     { id: "validation", title: "3. Real-World Validation", auto: `${counts.validation}/50 documented interactions`, autoOk: counts.validation >= 50, hint: "Use the /validation tester kit + QR, then export CSV." },
     { id: "docs", title: "4. Technical Documentation", auto: "docs/ has the 16 spec files in-repo", autoOk: true, hint: "README + docs/ + architecture notes. Check they match the built app." },

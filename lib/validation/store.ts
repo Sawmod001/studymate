@@ -1,4 +1,4 @@
-// Client-side validation store (localStorage). Used until Supabase keys are set,
+// Client-side validation store (localStorage). Used until Neon keys are set,
 // and as an offline backup afterwards. No personal data — aggregates only.
 "use client";
 

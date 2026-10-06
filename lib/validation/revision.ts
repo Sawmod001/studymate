@@ -1,4 +1,4 @@
-// Spaced-revision queue (device-local until Supabase quiz_attempts sync lands).
+// Spaced-revision queue (device-local until Neon quiz_attempts sync lands).
 // Wrong quiz answers land here; history page surfaces "Review weak topics".
 "use client";
 

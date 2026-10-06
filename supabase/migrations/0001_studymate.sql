@@ -1,4 +1,5 @@
--- N-ATLAS StudyMate schema per 06-DATABASE.md (Supabase PostgreSQL)
+-- N-ATLAS StudyMate schema (Neon Postgres — run in the Neon SQL editor)
+create extension if not exists pgcrypto;
 create table if not exists study_sessions (
   id uuid primary key default gen_random_uuid(),
   session_key text not null unique,

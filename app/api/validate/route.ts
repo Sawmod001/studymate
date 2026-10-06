@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/db/server";
+import { getNeon, isNeonConfigured } from "@/lib/db/neon";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
 
 // POST /api/validate — validation interaction log per 05-VALIDATION.md.
-// Works without Supabase (202 accepted-local) so field testing isn't blocked.
+// Works without Neon (202 accepted-local) so field testing isn't blocked.
 const schema = z.object({
   language: z.string().min(1).max(16),
   inputType: z.enum(["voice", "text"]),
@@ -17,17 +17,16 @@ const schema = z.object({
   feedback: z.string().max(1000).optional().default(""),
 });
 
-// GET /api/validate — validation rows for the dashboard (Supabase only).
+// GET /api/validate — validation rows for the dashboard (Neon only).
 export async function GET() {
-  if (!isSupabaseConfigured()) {
-    return NextResponse.json({ success: true, provider: "localStorage (set Supabase keys to sync)", interactions: [] });
+  if (!isNeonConfigured()) {
+    return NextResponse.json({ success: true, provider: "localStorage (set DATABASE_URL to sync)", interactions: [] });
   }
   try {
-    const db = getSupabaseAdmin();
-    if (!db) throw new Error("no-db");
-    const { data, error } = await db.from("validation_interactions").select("*").order("created_at", { ascending: false }).limit(500);
-    if (error) throw error;
-    return NextResponse.json({ success: true, provider: "supabase", interactions: data ?? [] });
+    const sql = getNeon();
+    if (!sql) throw new Error("no-db");
+    const rows = await sql`select * from validation_interactions order by created_at desc limit 500`;
+    return NextResponse.json({ success: true, provider: "neon", interactions: rows });
   } catch {
     return NextResponse.json({ success: false, error: { code: "DB_UNAVAILABLE", message: "Could not load validation data." } }, { status: 503 });
   }
@@ -43,26 +42,18 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json({ success: false, error: { code: "VALIDATION_ERROR", message: "Invalid feedback payload." } }, { status: 400 });
   }
-  if (!isSupabaseConfigured()) {
-    return NextResponse.json({ success: true, provider: "accepted-local (set Supabase keys to persist)", id: null }, { status: 202 });
+  if (!isNeonConfigured()) {
+    return NextResponse.json({ success: true, provider: "accepted-local (set DATABASE_URL to persist)", id: null }, { status: 202 });
   }
   try {
-    const db = getSupabaseAdmin();
-    if (!db) throw new Error("no-db");
+    const sql = getNeon();
+    if (!sql) throw new Error("no-db");
     const v = parsed.data;
-    const { data, error } = await db.from("validation_interactions").insert({
-      language: v.language,
-      input_type: v.inputType,
-      subject: v.subject || null,
-      academic_level: v.academicLevel || null,
-      transcription_success: v.transcriptionSuccess,
-      usefulness: v.usefulness ?? null,
-      clarity: v.clarity ?? null,
-      user_correction: v.userCorrection,
-      feedback: v.feedback || null,
-    }).select("id").single();
-    if (error) throw error;
-    return NextResponse.json({ success: true, provider: "supabase", id: (data as { id: string }).id });
+    const rows = await sql`
+      insert into validation_interactions (language, input_type, subject, academic_level, transcription_success, usefulness, clarity, user_correction, feedback)
+      values (${v.language}, ${v.inputType}, ${v.subject || null}, ${v.academicLevel || null}, ${v.transcriptionSuccess}, ${v.usefulness ?? null}, ${v.clarity ?? null}, ${v.userCorrection}, ${v.feedback || null})
+      returning id`;
+    return NextResponse.json({ success: true, provider: "neon", id: (rows[0] as { id: string }).id });
   } catch {
     return NextResponse.json({ success: false, error: { code: "DB_UNAVAILABLE", message: "Could not save feedback." } }, { status: 503 });
   }

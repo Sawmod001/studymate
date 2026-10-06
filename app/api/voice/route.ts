@@ -5,6 +5,7 @@ import { logEvidence } from "@/lib/ai/evidence-log";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
 import { generateStudyResponse, buildLocalPlaceholder, type StudyLanguage } from "@/lib/ai/natlas";
 import { studyResponseSchema } from "@/lib/ai/schemas";
+import { archiveAudio, audioArchivingEnabled } from "@/lib/storage/neon-storage";
 
 const MAX_AUDIO_BYTES = 10 * 1024 * 1024; // 10 MB
 const langs = ["yo", "ha", "ig", "en-NG", "en"] as const;
@@ -52,6 +53,7 @@ export async function POST(req: Request) {
 
   const { language, academicLevel, subject, mode } = meta.data;
   let transcript: string;
+  let audioKey: string | null = null;
   const tAsr = Date.now();
   try {
     const buf = Buffer.from(await file.arrayBuffer());
@@ -62,6 +64,13 @@ export async function POST(req: Request) {
       language: language as StudyLanguage,
     }));
     logEvidence({ kind: "asr", model: asrModelFor(language), ok: true, ms: Date.now() - tAsr });
+    // Opt-in raw-audio archive for validation evidence (default OFF).
+    if (audioArchivingEnabled()) {
+      try {
+        audioKey = `audio/${crypto.randomUUID()}.webm`;
+        await archiveAudio(buf, audioKey, file.type);
+      } catch { audioKey = null; }
+    }
   } catch (e: unknown) {
     const code = (e as { code?: string })?.code ?? "ASR_FAILED";
     logEvidence({ kind: "asr", model: asrModelFor(language), ok: false, ms: Date.now() - tAsr, code });
@@ -84,7 +93,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: { code: "NATLAS_SCHEMA_MISMATCH", message: "N-ATLAS returned an unexpected shape." }, transcript }, { status: 502 });
     }
     logEvidence({ kind: "llm", model, ok: true, ms: Date.now() - tLlm });
-    return NextResponse.json({ success: true, provider: "natlas", transcript, language, lesson: { id: crypto.randomUUID(), ...valid.data } });
+    return NextResponse.json({ success: true, provider: "natlas", transcript, language, audioKey, lesson: { id: crypto.randomUUID(), ...valid.data } });
   } catch (e: unknown) {
     const code = (e as { code?: string })?.code ?? "NATLAS_UNAVAILABLE";
     logEvidence({ kind: "llm", model, ok: false, ms: Date.now() - tLlm, code });
@@ -95,6 +104,7 @@ export async function POST(req: Request) {
         provider: "local-placeholder-NOT-NATLAS",
         transcript,
         language,
+        audioKey,
         notice: "Transcript is genuine N-ATLAS ASR; explanation is a placeholder until NATLAS_LLM_PATH is set.",
         lesson: { id: crypto.randomUUID(), ...lesson },
       });

@@ -26,7 +26,7 @@ export default function HistoryPage() {
       <Header />
       <main className="mx-auto max-w-3xl px-6 pb-16">
         <h1 className="text-3xl font-bold">History</h1>
-        <p className="mt-1 text-sm text-zinc-500">Local device history (Supabase sync activates with keys).</p>
+        <p className="mt-1 text-sm text-zinc-500">Local device history (Neon sync activates with keys).</p>
 
         {rev.length > 0 && (
           <section className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4 dark:bg-zinc-900">

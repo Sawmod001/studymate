@@ -1,6 +1,6 @@
 "use client";
 // Anonymous session key (no login per MVP privacy rule). Sent with history
-// saves so Supabase rows group by device without personal data.
+// saves so Neon rows group by device without personal data.
 export function getSessionKey(): string {
   try {
     let k = localStorage.getItem("studymate-session");

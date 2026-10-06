@@ -52,7 +52,7 @@ export default function Home() {
           </div>
         </section>
         <footer className="mt-12 border-t pt-4 text-sm text-zinc-500">
-          NAIC 2026. Copy <code>.env.example</code> to <code>.env.local</code> and fill Supabase + N-ATLAS keys. See README + /docs.
+          NAIC 2026. Copy <code>.env.example</code> to <code>.env.local</code> and fill Neon + N-ATLAS keys. See README + /docs.
           <span className="mt-1 block">N-ATLaS is an initiative of the Federal Ministry of Communications, Innovation and Digital Economy, and powered by Awarri Technologies.</span>
         </footer>
       </main>

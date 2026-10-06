@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/db/server";
+import { getNeon, isNeonConfigured } from "@/lib/db/neon";
 
 const quizSchema = z.object({
   lessonId: z.string().min(1),
@@ -18,18 +18,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, error: { code: "VALIDATION_ERROR", message: "lessonId + answers required." } }, { status: 400 });
   }
   const entries = Object.entries(parsed.data.answers);
-  if (isSupabaseConfigured()) {
+  if (isNeonConfigured()) {
     try {
-      const db = getSupabaseAdmin();
-      if (db) {
-        await db.from("quiz_attempts").insert({
-          lesson_id: parsed.data.lessonId,
-          score: parsed.data.score,
-          total: parsed.data.total || entries.length,
-          answers: parsed.data.answers,
-        });
+      const sql = getNeon();
+      if (sql) {
+        await sql`
+          insert into quiz_attempts (lesson_id, score, total, answers)
+          values (${parsed.data.lessonId}, ${parsed.data.score}, ${parsed.data.total || entries.length}, ${JSON.stringify(parsed.data.answers)})`;
       }
-    } catch { /* device-local lesson id or RLS — non-fatal */ }
+    } catch { /* device-local lesson id (no FK row) — non-fatal */ }
   }
   return NextResponse.json({
     success: true,

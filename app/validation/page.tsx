@@ -4,7 +4,7 @@ import Link from "next/link";
 import Header from "@/components/layout/Header";
 import { loadValidationLocal, type ValidationEntry } from "@/lib/validation/store";
 
-interface Row extends ValidationEntry { id?: string; source: "device" | "supabase" }
+interface Row extends ValidationEntry { id?: string; source: "device" | "neon" }
 
 function Bar({ label, pct, value }: { label: string; pct: number; value: string }) {
   return (
@@ -38,10 +38,10 @@ export default function ValidationPage() {
           usefulness: Number(x.usefulness ?? 0),
           clarity: (x.clarity as Row["clarity"]) ?? "yes",
           userCorrection: Boolean(x.user_correction),
-          source: "supabase" as const,
+          source: "neon" as const,
         }));
         setRows([...mapped, ...local]);
-        setProvider("supabase+device");
+        setProvider("neon+device");
       } else if (d.provider) setProvider(String(d.provider));
     }).catch(() => {});
   }, []);
@@ -148,7 +148,7 @@ export default function ValidationPage() {
         <TesterKit />
         <p className="mt-4 text-xs text-zinc-500">
           Privacy: interactions log language, subject, scores and transcript outcomes only — no names, phone numbers or student IDs.
-          Raw audio is never stored. Records are kept only for challenge evidence and product improvement.
+          Raw audio is never stored unless audio archiving is explicitly enabled for validation evidence (see README).
         </p>
       </main>
     </div>

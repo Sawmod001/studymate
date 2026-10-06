@@ -38,7 +38,7 @@ function saveLocal(item: { id: string; title: string; subject: string; language:
   } catch {}
 }
 
-// Fire-and-forget Supabase sync (server returns 202 when keys are missing).
+// Fire-and-forget Neon sync (server returns 202 when keys are missing).
 function persistServer(item: { question: string; inputType: "voice" | "text"; transcript: string; subject: string; language: string; level: string; lesson: Lesson }) {
   try {
     void fetch("/api/history", {
