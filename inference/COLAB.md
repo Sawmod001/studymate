@@ -35,7 +35,7 @@ print(torch.cuda.is_available(), torch.cuda.get_device_name(0))
 
 ```python
 !git clone https://github.com/Sawmod001/studymate
-%cd studymate/n-atlas-studymate/inference
+%cd studymate/inference
 !pip install -q -r requirements.txt
 !pip install -q torch --index-url https://download.pytorch.org/whl/cu121
 ```
