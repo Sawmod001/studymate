@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import VoiceRecorder, { type VoiceResult } from "@/components/voice/VoiceRecorder";
 import ReadAloud from "@/components/study/ReadAloud";
@@ -62,6 +62,14 @@ export default function StudyPage() {
   const [error, setError] = useState("");
   const [transcript, setTranscript] = useState("");
   const [inputType, setInputType] = useState<"text" | "voice">("text");
+  const [engine, setEngine] = useState<"checking" | "live" | "down" | "unconfigured">("checking");
+
+  useEffect(() => {
+    fetch("/api/health").then((r) => r.json()).then((h) => {
+      if (!h?.natlas?.baseUrlSet) setEngine("unconfigured");
+      else setEngine(h.natlas.reachable ? "live" : "down");
+    }).catch(() => setEngine("checking"));
+  }, []);
   // Validation feedback (05-VALIDATION.md mini-form)
   const [useful, setUseful] = useState(5);
   const [correct, setCorrect] = useState("yes");
@@ -131,6 +139,19 @@ export default function StudyPage() {
     <div className="mx-auto max-w-3xl px-6 py-8">
       <Link href="/" className="text-sm underline">← Home</Link>
       <h1 className="mt-2 text-3xl font-bold">Study</h1>
+      {engine === "live" && (
+        <p className="mt-2 rounded bg-green-100 p-2 text-sm text-green-900">● AI engine live — genuine N-ATLAS answers.</p>
+      )}
+      {engine === "down" && (
+        <p className="mt-2 rounded bg-red-100 p-2 text-sm text-red-900">
+          ● AI engine offline (Colab/tunnel asleep) — questions will fail until it is restarted. Answers are never faked.
+        </p>
+      )}
+      {engine === "unconfigured" && (
+        <p className="mt-2 rounded bg-amber-100 p-2 text-sm text-amber-900">
+          N-ATLAS not configured — answers are labeled placeholders until keys are set.
+        </p>
+      )}
       {provider.includes("local-placeholder") && (
         <p className="mt-2 rounded bg-amber-100 p-2 text-sm text-amber-900">
           Placeholder answer (NOT N-ATLAS). {notice || "Set N-ATLAS keys for genuine responses."}
