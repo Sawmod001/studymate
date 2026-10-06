@@ -44,3 +44,11 @@ Check status anytime: `GET /api/health` (config presence only, no secrets).
 - **Path A (hosted API):** use official NCAIR/NAIC credentials in `.env.local`. Fastest if you get them.
 - **Path B (self-host):** `inference/` runs the official `NCAIR1/N-ATLaS` weights on your own CUDA GPU and speaks the same contract, so the app works unchanged. See `inference/README.md`.
 - Either way, ASR must be the official N-ATLAS ASR service (PS2 key requirement) — the model card ships text weights only.
+
+## License & attribution (required by the N-ATLaS terms)
+
+Education use is explicitly permitted. Cap: max 1000 active end-users per 30 days
+(we are far below; exceeding it needs a commercial license from Awarri/FMCIDE).
+Keep this attribution visible: “N-ATLaS is an initiative of the Federal Ministry
+of Communications, Innovation and Digital Economy, and powered by Awarri
+Technologies.” Derivative renames must carry the suffix “Powered by Awarri.”
