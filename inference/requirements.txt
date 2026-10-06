@@ -1,7 +1,12 @@
 fastapi>=0.115
 uvicorn[standard]>=0.30
+python-multipart>=0.0.9
 transformers>=4.44
 accelerate>=0.33
+bitsandbytes>=0.43  # only needed for NATLAS_LOAD_8BIT=1 (Colab free T4)
+soundfile>=0.12
+scipy>=1.11
+numpy>=1.26
 # torch: install the CUDA build separately for your driver, e.g.
 # pip install torch --index-url https://download.pytorch.org/whl/cu121
 torch>=2.4
